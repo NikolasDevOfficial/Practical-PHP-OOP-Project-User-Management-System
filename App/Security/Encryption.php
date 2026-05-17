@@ -1,5 +1,5 @@
 <?php
-namespace App\Core;
+namespace App\Security;
 
 class Encryption {
     private $ciphering = "AES-256-CBC"; 

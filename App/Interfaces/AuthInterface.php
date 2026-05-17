@@ -1,5 +1,5 @@
 <?php
-namespace App\Core\Users;
+namespace App\Interfaces;
 
 interface AuthInterface {
 

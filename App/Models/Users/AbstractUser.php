@@ -3,7 +3,9 @@
 //abstract class; done 
 // hash passwords, find a newer method; done
 // encrypt usernames and emails; done 
-namespace App\Core;
+namespace App\Models\Users;
+
+use App\Security\Encryption;
 
 abstract class AbstractUser  {
     protected $userName;
@@ -19,7 +21,7 @@ abstract class AbstractUser  {
     $this->encryption=$encryption;
     
         $this->userName = $encryption->encrypt($userName);
-        $this->userEmail = $encryption->encrypt($userEmail);
+       $this->userEmail = $userEmail;
         $this->userPassword = password_hash($userPassword, PASSWORD_ARGON2I);
         $this-> userId = $encryption->encrypt($userId);
     }
@@ -31,9 +33,9 @@ abstract class AbstractUser  {
 
     public function getEmail() {
         
-        return $this->encryption->decrypt($this->userEmail);
+        return $this->userEmail;
     }
-   public function getUserId(): int {
+   public function getUserId() {
         return $this->encryption->decrypt($this->userId);
     }
 
