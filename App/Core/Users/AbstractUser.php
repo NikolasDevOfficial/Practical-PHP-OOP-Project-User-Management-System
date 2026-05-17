@@ -5,32 +5,40 @@
 // encrypt usernames and emails; done 
 namespace App\Core;
 
-abstract class AbstractUser {
+abstract class AbstractUser  {
     protected $userName;
     protected $userEmail;
     protected $userPassword;
+    protected $userId;
+    protected $userRole;
 
-    public function __construct($userName, $userEmail, $userPassword) {
+    protected Encryption $encryption;
 
-        $encryption = new Encryption();
+    public function __construct(Encryption $encryption, $userName, $userEmail, $userPassword, $userId) {
 
+    $this->encryption=$encryption;
+    
         $this->userName = $encryption->encrypt($userName);
         $this->userEmail = $encryption->encrypt($userEmail);
         $this->userPassword = password_hash($userPassword, PASSWORD_ARGON2I);
+        $this-> userId = $encryption->encrypt($userId);
     }
 
     public function getName() {
 
-        $encryption = new Encryption();
-        return $encryption->decrypt($this->userName);
+        return $this->encryption->decrypt($this->userName);
     }
 
     public function getEmail() {
         
-        $encryption = new Encryption();
-        return $encryption->decrypt($this->userEmail);
+        return $this->encryption->decrypt($this->userEmail);
+    }
+   public function getUserId(): int {
+        return $this->encryption->decrypt($this->userId);
     }
 
-    abstract public function userRole();
+    abstract public function userRole(): string;
+
+
 }
 ?>
