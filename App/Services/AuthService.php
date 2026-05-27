@@ -25,5 +25,14 @@ class AuthService {
     ];
     
 }
+public function logout($user)
+{
+    $user->logUserActivity(AuthResponse::LogoutSuccess, "INFO");
 
+    return [
+        "status" => true,
+        "message" => AuthResponse::LogoutSuccess,
+        "user" => $user->getUserId()
+    ];
+}
 }
