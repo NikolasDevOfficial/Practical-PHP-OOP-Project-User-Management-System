@@ -1,0 +1,69 @@
+header { 
+    height:5vh;
+    width:100vw;
+    background-color:oklch(55.4% 0.046 257.417);
+    top:0px;
+    position:fixed;
+    left: 0;
+
+}
+
+body { 
+    
+    background-color:oklch(70.4% 0.04 256.788);
+    display:grid;
+    justify-content: center;
+    align-items:center;
+    height:100vh;
+    width:100vw;
+
+}
+
+#loginBox {
+    border-radius: 5%;
+    height: 45vh;
+    margin: 25px;
+    width:20vw;
+    background-color: oklch(44.6% 0.043 257.281);
+    justify-content:flex-start;
+    display:flex;
+    align-items: center;
+flex-direction: column;
+}
+
+#email { 
+height:50px;
+width:75%;
+margin-bottom:35px;
+margin-top:35%;
+margin-top:25px;
+border-radius:15px;
+}
+
+
+
+#password { 
+    height:50px;
+    width:75%;
+border-radius:15px;
+}
+
+#buttonSubmitLogin { 
+
+    width: 50%;
+    height:50px;
+    border-radius:12px;
+    margin-top: 42px;
+
+}
+
+footer {
+    height:5vh;
+    width:100vw;
+    background-color:oklch(55.4% 0.046 257.417);
+    bottom: 0px;
+    position:fixed;
+    left: 0;
+
+
+}
