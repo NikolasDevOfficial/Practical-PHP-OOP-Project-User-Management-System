@@ -13,14 +13,24 @@ public function __construct($pdo)
     public function Authentication($userEmail, $userPassword)
 {
     require_once __DIR__ . "/../../database.php";
+    
+$encryption = new \App\Security\Encryption();
+$encryptedEmail = $encryption->encrypt($userEmail);
 
-    $stmt = $this->pdo->prepare("
-        SELECT * FROM users WHERE email = :email
-    ");
+$stmt = $this->pdo->prepare("
+    SELECT * FROM users WHERE email = :email
+");
 
-    $stmt->execute([
-        ":email" => $userEmail
-    ]);
+$stmt->execute([
+    ":email" => $encryptedEmail
+]);
+    // $stmt = $this->pdo->prepare("
+    //     SELECT * FROM users WHERE email = :email
+    // ");
+
+    // $stmt->execute([
+    //     ":email" => $userEmail
+    // ]);
 
     $dbUser = $stmt->fetch(\PDO::FETCH_ASSOC);
 
