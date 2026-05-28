@@ -2,28 +2,49 @@
 
 namespace App\Services;
 
-
 use App\Services\AuthResponse;
 class AuthService {
-
-    public function Authentication($user, $userEmail, $userPassword)
+private $pdo;
+public function __construct($pdo)
 {
-    if ($user->getEmail() !== $userEmail) {
-        return ["status" => false, "message" => AuthResponse::InvalidEmail, 'ID' => $user-> getUserId()];
+    $this->pdo = $pdo;
+}
+
+    public function Authentication($userEmail, $userPassword)
+{
+    require_once __DIR__ . "/../../database.php";
+
+    $stmt = $this->pdo->prepare("
+        SELECT * FROM users WHERE email = :email
+    ");
+
+    $stmt->execute([
+        ":email" => $userEmail
+    ]);
+
+    $dbUser = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+    if (!$dbUser) {
+        return [
+            "status" => false,
+            "message" => AuthResponse::InvalidEmail
+        ];
     }
 
-    if (!$user->verifyPassword($userPassword)) {
-        return ["status" => false, "message" => AuthResponse::InvalidPassword, 'ID' => $user-> getUserId()];
+    if (!password_verify($userPassword, $dbUser["password"])) {
+        return [
+            "status" => false,
+            "message" => AuthResponse::InvalidPassword,
+            "ID" => $dbUser["id"]
+        ];
     }
-    
-    $user->logUserActivity(AuthResponse::LoginSuccess, "INFO");
+    error_log("DEBUG: INFO | User {$dbUser["id"]} | LOG: Login Success");
 
     return [
         "status" => true,
         "message" => AuthResponse::LoginSuccess,
-        "user" => $user-> getUserId()
+        "user" => $dbUser["id"]
     ];
-    
 }
 public function logout($user)
 {

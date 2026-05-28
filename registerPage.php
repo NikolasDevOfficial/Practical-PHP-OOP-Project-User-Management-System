@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . "/autoloader.php";
+require_once __DIR__ . "/database.php";
 
 
 use App\Security\Encryption;
@@ -7,24 +8,34 @@ use App\Models\Users\RegularUser;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    if (!isset($_SESSION["users"])) {
-        $_SESSION["users"] = [];
-    }
-
     $username = trim($_POST["username"]);
     $email = trim($_POST["email"]);
-    $password = $_POST["password"];
+    $userPassword = $_POST["password"];
+
+$encryption = new Encryption();
 
     $user = new RegularUser(
-        new Encryption(),
+        $encryption,
         $username,
         $email,
-        $password,
-        uniqid()
+        $userPassword,
+        bin2hex(random_bytes(16))
     );
 
-$_SESSION["user"] = $user;
-$_SESSION["users"][] = $user;
+   $_SESSION["user"] = $user->getUserId();
+
+    $stmt = $pdo->prepare("
+        INSERT INTO users (id, username, email, password, role)
+        VALUES (:id, :username, :email, :password, :role)
+    ");
+
+    $stmt->execute([
+        ":id" => $user->getUserId(),
+        ":username" => $encryption -> encrypt($username),
+        ":email" => $encryption -> encrypt($email),
+        ":password" => password_hash($userPassword, PASSWORD_ARGON2I),
+        ":role" => "User"
+    ]);
 
     header("Location: homepage.php");
     exit;

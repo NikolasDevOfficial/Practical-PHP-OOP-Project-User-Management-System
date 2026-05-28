@@ -1,19 +1,38 @@
 <?php
 require_once __DIR__ . "/autoloader.php";
+require_once __DIR__ . "/database.php";
 
 if (!isset($_SESSION["user"])) {
     header("Location: AccessDenied.php");
     exit;
 }
 
-$currentUser = $_SESSION["user"];
-$isAdmin = ($currentUser->userRole() === "Admin");
+
+$stmt = $pdo->prepare("SELECT * FROM users WHERE id = :id");
+$stmt->execute([
+    ":id" => $_SESSION["user"]
+]);
+
+$currentUser = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$currentUser) {
+    session_destroy();
+    header("Location: loginPage.php");
+    exit;
+}
+
+$isAdmin = ($currentUser["role"] === "Admin");
+
+
+$stmt = $pdo->query("SELECT * FROM users");
+$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
     <title>List of Users</title>
+    
     <link rel="stylesheet" href="assets/usersProfilePageDesign.css">
 </head>
 
@@ -22,7 +41,7 @@ $isAdmin = ($currentUser->userRole() === "Admin");
 
     <?php if (isset($_SESSION["user"])): ?>
         <span id="userNameList">
-            <?= htmlspecialchars($currentUser->getName()) ?>
+        <?= htmlspecialchars($encryption->decrypt($currentUser["username"])) ?>
         </span>
 
         <form id="logoutUserList" method="POST" action="logout.php">
@@ -42,24 +61,26 @@ $isAdmin = ($currentUser->userRole() === "Admin");
 
         <div id="listDesign">
 
-           <?php foreach ($_SESSION["users"] ?? [] as $index => $user): ?>
+            <?php 
+            use App\Security\Encryption;
+            $encryption = new Encryption();
+            foreach ($users as $user): ?>
 
-    <?php if (is_object($user) && method_exists($user, "getName")): ?>
-        <div class="userRow">
+                <div class="userRow">
 
-            <?= htmlspecialchars($user->getName()) ?>
+                    <?= htmlspecialchars($encryption->decrypt($user["username"])) ?>
 
-            <?php if ($isAdmin): ?>
-                <form method="POST" action="deleteUser.php">
-                       <input type="hidden" name="userId" value="<?= $user->getUserId() ?>">
-                    <button type="submit">Delete</button>
-                </form>
-            <?php endif; ?>
+                    <?php if ($isAdmin): ?>
+                        <form method="POST" action="deleteUser.php">
+                            <input type="hidden" name="userId" value="<?= $user["id"] ?>">
+                            <button type="submit">Delete</button>
+                        </form>
+                    <?php endif; ?>
 
-        </div>
-    <?php endif; ?>
+                </div>
 
-<?php endforeach; ?>
+            <?php endforeach; ?>
+
         </div>
 
     </main>
@@ -68,6 +89,8 @@ $isAdmin = ($currentUser->userRole() === "Admin");
 
 </body>
 
-<footer> User Management System Project </footer>
+<footer>
+    User Management System Project
+</footer>
 
 </html>
