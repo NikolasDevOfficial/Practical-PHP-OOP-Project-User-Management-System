@@ -54,9 +54,12 @@ $encryption = new Encryption();
 <header>User Management System</header>
 <form id = "loginBox" method="POST">
 
-    <input id = "username" type="text" name="username" placeholder="Username">
-    <input id = "email" type="email" name="email" placeholder="Email">
-    <input id = "password" type="password" name="password" placeholder="Password">
+
+<input id="username" type="text" name="username" placeholder="Enter username">
+
+<input id="email" type="email" name="email" placeholder="Enter email">
+
+<input id="password" type="password" name="password" placeholder="Enter password">
 
     <button id = "buttonSubmitLogin" type="submit">Register</button>
 </p>
